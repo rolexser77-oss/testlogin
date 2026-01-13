@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Verifying...</title>
+  <style>
+    body { font-family: Arial, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; }
+  </style>
+</head>
+<body>
+  <div>
+    <h3 id="status">Verifying your email...</h3>
+    <p id="detail"></p>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://qrxzvlmqihbcaxiymimu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyeHp2bG1xaWhiY2F4aXltaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMDc0OTIsImV4cCI6MjA4Mzg4MzQ5Mn0.JxCLthy96S5adjnln7_G1kMrwvkgEPqac1RpkcBQko0";
+  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const statusEl = document.getElementById("status");
+  const detailEl = document.getElementById("detail");
+
+  (async () => {
+    try {
+      // ✅ This is the key for email confirmation flow in Supabase v2
+      const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+
+      if (error) {
+        statusEl.textContent = "Verification failed";
+        detailEl.textContent = error.message;
+        return;
+      }
+
+      statusEl.textContent = "Email verified ✅";
+      detailEl.textContent = "Redirecting to app...";
+
+      // If session exists, go to app
+      if (data.session) {
+        window.location.href = "app.html";
+      } else {
+        // fallback
+        window.location.href = "index.html";
+      }
+    } catch (e) {
+      statusEl.textContent = "Something went wrong";
+      detailEl.textContent = String(e);
+    }
+  })();
+</script>
+</body>
+</html>
