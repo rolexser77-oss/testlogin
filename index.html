@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Supabase Auth Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f2f2f2; height:100vh; display:flex; align-items:center; justify-content:center; }
+    .box { width:320px; background:#fff; padding:24px; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,.08); }
+    input, button { width:100%; padding:10px; margin-top:10px; box-sizing:border-box; }
+    button { cursor:pointer; }
+    .msg { margin-top:12px; font-size:14px; }
+    .small { font-size:12px; color:#666; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Login / Signup</h2>
+
+  <input id="email" type="email" placeholder="Email" />
+  <input id="password" type="password" placeholder="Password (min 6 chars)" />
+
+  <button id="signupBtn">Sign Up (email verify)</button>
+  <button id="loginBtn">Login</button>
+
+  <p class="msg" id="msg"></p>
+  <p class="small">After signup, check your email and click the verification link.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ✅ Replace these
+  const SUPABASE_URL = "https://qrxzvlmqihbcaxiymimu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyeHp2bG1xaWhiY2F4aXltaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMDc0OTIsImV4cCI6MjA4Mzg4MzQ5Mn0.JxCLthy96S5adjnln7_G1kMrwvkgEPqac1RpkcBQko0";
+
+  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const msgEl = document.getElementById("msg");
+  const emailEl = document.getElementById("email");
+  const passEl = document.getElementById("password");
+
+  function setMsg(text) { msgEl.textContent = text; }
+
+  async function ensureNotLoggedInRedirect() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) window.location.href = "app.html";
+  }
+
+  ensureNotLoggedInRedirect();
+
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const email = emailEl.value.trim();
+    const password = passEl.value;
+
+    if (!email || !password) return setMsg("Enter email + password");
+    setMsg("Signing up...");
+
+    // ✅ This makes the verification link return to callback.html
+    const redirectTo = `${window.location.origin}/callback.html`;
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: redirectTo }
+    });
+
+    if (error) return setMsg(error.message);
+
+    setMsg("Signup ok. Check your email for the verification link.");
+  });
+
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = emailEl.value.trim();
+    const password = passEl.value;
+
+    if (!email || !password) return setMsg("Enter email + password");
+    setMsg("Logging in...");
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) return setMsg(error.message);
+
+    // If email not confirmed, Supabase can still block based on settings.
+    // We'll just redirect if session exists.
+    if (data.session) window.location.href = "app.html";
+    else setMsg("No session. Verify your email first.");
+  });
+</script>
+
+</body>
+</html>
