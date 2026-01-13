@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Main Page</title>
+</head>
+<body>
+
+<h1>DEMO</h1>
+<button onclick="logout()">Logout</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://qrxzvlmqihbcaxiymimu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyeHp2bG1xaWhiY2F4aXltaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMDc0OTIsImV4cCI6MjA4Mzg4MzQ5Mn0.JxCLthy96S5adjnln7_G1kMrwvkgEPqac1RpkcBQko0";
+
+  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
+  }
+</script>
+
+</body>
+</html>
