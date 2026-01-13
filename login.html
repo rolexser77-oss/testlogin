@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Supabase Auth Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f2f2f2;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Login / Signup</h2>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
+  <p id="msg"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // 👇 Replace with your Supabase keys
+  const SUPABASE_URL = "https://qrxzvlmqihbcaxiymimu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyeHp2bG1xaWhiY2F4aXltaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMDc0OTIsImV4cCI6MjA4Mzg4MzQ5Mn0.JxCLthy96S5adjnln7_G1kMrwvkgEPqac1RpkcBQko0";
+
+  const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function signup() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+
+    document.getElementById("msg").innerText =
+      error ? error.message : "Signup successful. Now login.";
+  }
+
+  async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      document.getElementById("msg").innerText = error.message;
+    } else {
+      window.location.href = "app.html";
+    }
+  }
+</script>
+
+</body>
+</html>
